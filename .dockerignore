@@ -1,0 +1,28 @@
+# Binaries and build artifacts
+/bin
+/build
+/dist
+/target
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Cache and VCS
+**/.cache
+**/node_modules
+**/.git
+
+# Local dev files
+.env
+.env.*
+*.log
+.idea
+.vscode
+.DS_Store
+
+# Docker files we don't need in context
+docker-compose.yml

@@ -1,4 +1,4 @@
-version: '3.8'
+# Removed 'version: "3.8"' as it’s obsolete in Docker Compose v2.x
 
 services:
   postgres:
@@ -12,6 +12,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stocky"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   redis:
     image: redis:7-alpine
@@ -20,6 +26,12 @@ services:
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
   stocky-api:
     build: .
@@ -34,11 +46,11 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   postgres_data:
   redis_data:
-
-

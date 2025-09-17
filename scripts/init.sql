@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS stock_symbols (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Stock rewards
+
+-- Stock rewards (partitioned by reward_timestamp month)
 CREATE TABLE IF NOT EXISTS stock_rewards (
     reward_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id VARCHAR(50) NOT NULL REFERENCES users(user_id),
@@ -42,7 +43,7 @@ CREATE TABLE IF NOT EXISTS stock_rewards (
     CONSTRAINT chk_value_calculation CHECK (
         ABS(total_stock_value - (shares * price_at_reward)) < 0.01
     )
-);
+) PARTITION BY RANGE (reward_timestamp);
 
 CREATE INDEX IF NOT EXISTS idx_stock_rewards_user_date ON stock_rewards (user_id, DATE(reward_timestamp));
 CREATE INDEX IF NOT EXISTS idx_stock_rewards_timestamp ON stock_rewards (reward_timestamp);
